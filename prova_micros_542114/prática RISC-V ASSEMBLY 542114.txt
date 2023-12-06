@@ -1,0 +1,43 @@
+6.21
+addi s1, zero, 0   # i = 0
+addi t1, zero, 0   # t1 = 0
+addi t2, zero, 200 # t2 = 200
+
+for:
+    bge s1, t2, done  # Se i >= 200, vá para done (saída do loop)
+    slli t0, s1, 2    # t0 = i * 4 (multiplica i por 4)
+    add t0, t0, s0    # Endereço de scores[i] (soma o endereço base com o índice i)
+    lw t1, 0(t0)      # t1 = scores[i] (carrega o valor de scores[i])
+    addi t1, t1, 10   # t1 = scores[i] + 10 (adiciona 10 ao valor de scores[i])
+    sw t1, 0(t0)      # scores[i] = t1 (armazena o novo valor de scores[i])
+    addi s1, s1, 1    # i = i + 1 (incrementa o contador i)
+    beq zero, zero, for  # Salta de volta para o início do loop
+
+done:
+
+
+—------------------------------------------------------------
+6.28
+factorial:
+    addi s0, zero, 5  # fat = 5 (inicializa a variável fat com 5)
+    addi s1, zero, 1  # r = 1 (inicializa a variável r com 1)
+
+while:
+    beq s0, zero, exit  # Se fat = 0, vá para exit (condição de saída do loop)
+
+    add s2, zero, s0  # i_temp = fat (cria uma cópia do valor de fat)
+    add s3, zero, zero  # r_temp = 0 (inicializa r_temp com 0)
+
+mult:
+    beq s2, zero, end_mult  # Se i_temp = 0, vá para end_mult (finaliza a multiplicação)
+
+    add s3, s3, s1  # r_temp += r (soma r a r_temp)
+    addi s2, s2, -1  # i_temp -= 1 (decrementa i_temp)
+    beq zero, zero, mult  # Loop infinito para multiplicar
+
+end_mult:
+    addi s1, s3, 0  # r = r_temp (atribui o valor de r_temp a r)
+    addi s0, s0, -1  # fat -= 1 (decrementa fat)
+    beq zero, zero, while  # Loop infinito para o while
+
+exit:

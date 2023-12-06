@@ -1,0 +1,54 @@
+addi a0, zero, 0x100 # ENDERECO_BASE1 = 0x100
+addi a1, zero, 0x200 # ENDERECO_BASE2 = 0x200
+addi a2, zero, 0x300 # ENDERECO_BASE3 = 0x300
+
+# Coeficientes do primeiro polinômio (f(x) = 5x^5 + 4x^4 + 2x^3 + x^2 + x + 4)
+addi t0, zero, 5
+sw t0, 0(a0) # Armazena o coeficiente 5x^5 no endereço base do primeiro polinômio
+addi t0, zero, 4
+sw t0, 4(a0) # Armazena o coeficiente 4x^4 no endereço base + 4 do primeiro polinômio
+addi t0, zero, 2
+sw t0, 8(a0) # Armazena o coeficiente 2x^3 no endereço base + 8 do primeiro polinômio
+addi t0, zero, 1
+sw t0, 12(a0) # Armazena o coeficiente 1x^2 no endereço base + 12 do primeiro polinômio
+addi t0, zero, 1
+sw t0, 16(a0) # Armazena o coeficiente 1x^1 no endereço base + 16 do primeiro polinômio
+addi t0, zero, 4
+sw t0, 20(a0) # Armazena o coeficiente 4x^0 no endereço base + 20 do primeiro polinômio
+
+# Coeficientes do segundo polinômio (g(x) = 2x^3 + x^2 + 3x + 1)
+addi t0, zero, 2
+sw t0, 0(a1) # Armazena o coeficiente 2x^3 no endereço base do segundo polinômio
+addi t0, zero, 1
+sw t0, 4(a1) # Armazena o coeficiente 1x^2 no endereço base + 4 do segundo polinômio
+addi t0, zero, 3
+sw t0, 8(a1) # Armazena o coeficiente 3x^1 no endereço base + 8 do segundo polinômio
+addi t0, zero, 1
+sw t0, 12(a1) # Armazena o coeficiente 1x^0 no endereço base + 12 do segundo polinômio
+
+# Inicialização de contadores
+mv t1, zero # i = 0 (contador para o primeiro polinômio)
+convoluir:    # Label para o loop de convolução
+
+    mv t0, zero # sum = 0 (inicializa a soma)
+    mv t2, zero # j = 0 (contador para o segundo polinômio)
+
+    nplusm:    # Rótulo para o loop interno de soma
+        add t3, a0, t1  # Calcula o endereço do coeficiente do primeiro polinômio
+        lw t4, 0(t3)    # Carrega o coeficiente do primeiro polinômio para t4
+        add t3, a1, t2  # Calcula o endereço do coeficiente do segundo polinômio
+        lw t5, 0(t3)    # Carrega o coeficiente do segundo polinômio para t5
+        add t3, t1, t2  # Calcula a posição do coeficiente do resultado
+        add t3, a2, t3  # Calcula o endereço do resultado
+        lw t6, 0(t3)    # Carrega o coeficiente do resultado para t6
+        mul t5, t5, t4  # Multiplica os coeficientes
+        add t6, t6, t5  # Soma ao coeficiente existente do resultado
+        sw t6, 0(t3)    # Armazena o resultado
+        
+        addi t2, t2, 4  # Incrementa o contador do segundo polinômio (passa para o próximo coeficiente)
+        addi t3, zero, 16  # Compara se j alcançou o tamanho máximo do segundo polinômio
+        bne t2, t3, nplusm # Se j < tamanho máximo, continua o loop interno
+
+    addi t1, t1, 4    # Incrementa o contador do primeiro polinômio (passa para o próximo coeficiente)
+    addi t3, zero, 24 # Compara se i alcançou o tamanho máximo do primeiro polinômio
+    bne t1, t3, convoluir # Se i < tamanho máximo, continua o loop externo

@@ -1,0 +1,42 @@
+addi a2, zero, 0x100  # Inicializa a2 com o endereço base 0x100
+addi a3, zero, 0      # Inicializa a3 com o índice 0
+addi a4, zero, 1      # Inicializa a4 com o número 1 (valor inicial dos Happy Numbers)
+addi a5, zero, 10     # Inicializa a5 com a base 10 para divisão
+addi a6, zero, 51     # Inicializa a6 com o valor máximo 51 (Valor de parada dos Happy Numbers)
+
+happy_Numbers:
+    beq a4, a6, exit   # Se a4 (valor atual) é igual a6 (valor de parada), sair do loop
+    mv t0, a4          # t0 = a4
+
+loop:
+    mv t1, zero        # Inicializa t1 (sum) com zero
+
+    soma_quadrado_digitos:
+        rem t2, t0, a5   # Calcula o resto da divisão t0 por 10
+        mul t3, t2, t2   # Calcula o quadrado do resto
+        div t0, t0, a5   # Divide t0 por 10
+        add t1, t1, t3   # Adiciona o quadrado do resto a t1
+        bne t0, zero, soma_quadrado_digitos  # Se t0 != 0, continua no loop
+
+    addi t2, zero, 1
+    beq t1, t2, true   # Se sum_digits é igual a 1, pule para a label 'true'
+    addi t2, zero, 4
+    beq t1, t2, false  # Se sum_digits é igual a 4, pule para a label 'false'
+
+    mv t0, t1          # Se sum_digits não é 1 nem 4, atualiza t0 para sum_digits
+    j loop   # Volta para o início do ciclo
+
+true:
+    add t0, a2, a3     # Calcula o endereço usando ENDERECO_BASE + INDEX
+    sw a4, 0(t0)       # Armazena o número no endereço calculado
+    addi a3, a3, 4     # Incrementa o índice em 4 (avança para o próximo slot no array)
+    j add_num          # Pula para a label 'add_num'
+
+false:
+    j add_num          # Pula para a label 'add_num'
+
+add_num:
+    addi a4, a4, 1     # Incrementa o número
+    j happy_Numbers    # Pula para a label 'Happy_Numbers'
+
+exit:
